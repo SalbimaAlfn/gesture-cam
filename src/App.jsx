@@ -1,0 +1,7 @@
+import Camera from "./components/Camera/Camera";
+
+function App() {
+  return <Camera />;
+}
+
+export default App;
