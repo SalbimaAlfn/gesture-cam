@@ -1,97 +1,127 @@
-import { useEffect } from "react";
-import { createHandLandmarker } from "../services/mediapipe";
-import drawHands from "../utils/drawHands";
-import detectGesture from "../utils/detectGesture";
-import applyEffect from "../utils/applyEffect";
+  import { useEffect } from "react";
+  import { createHandLandmarker } from "../services/mediapipe";
+  import drawHands from "../utils/drawHands";
+  import detectGesture from "../utils/detectGesture";
+  import applyEffect from "../utils/applyEffect";
+  import gestureManager from "../services/gestureManager";
 
-export default function useHandTracking({
+  export default function useHandTracking({
   videoRef,
   canvasRef,
   isReady,
 }) {
-  useEffect(() => {
-    if (!isReady) return;
 
-    let animationId;
-    let detector;
+  const trackingState = {
+    handDetected: false,
+    gesture: "None",
+    effect: "None",
+    fps: 0,
+  };
+    useEffect(() => {
+      if (!isReady) return;
 
-    async function initialize() {
-      detector = await createHandLandmarker();
+      let animationId;
+      let detector;
 
-      render();
-    }
+      async function initialize() {
+        detector = await createHandLandmarker();
 
-    function render() {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-
-      if (!video || !canvas) {
-        animationId = requestAnimationFrame(render);
-        return;
+        render();
       }
 
-      if (video.readyState < 2) {
-        animationId = requestAnimationFrame(render);
-        return;
-      }
+      function render() {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
 
-      const ctx = canvas.getContext("2d");
+        if (!video || !canvas) {
+          animationId = requestAnimationFrame(render);
+          return;
+        }
 
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+        if (video.readyState < 2) {
+          animationId = requestAnimationFrame(render);
+          return;
+        }
 
-      // Draw mirrored camera
-      ctx.save();
+        const ctx = canvas.getContext("2d");
 
-      ctx.scale(-1, 1);
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-      ctx.drawImage(
-        video,
-        -canvas.width,
-        0,
-        canvas.width,
-        canvas.height
-      );
+        // Draw mirrored camera
+        ctx.save();
 
-      ctx.restore();
+        ctx.scale(-1, 1);
 
-      // Hand detection
-      const results = detector.detectForVideo(
-        video,
-        performance.now()
-      );
+        ctx.drawImage(
+          video,
+          -canvas.width,
+          0,
+          canvas.width,
+          canvas.height
+        );
 
-if (results.landmarks.length > 0) {
+        ctx.restore();
 
-  const landmarks = results.landmarks[0];
+        // Hand detection
+        const results = detector.detectForVideo(
+          video,
+          performance.now()
+        );
 
-  drawHands(
-    ctx,
-    landmarks,
-    canvas.width,
-    canvas.height
-  );
+        trackingState.handDetected = false;
+        trackingState.gesture = "None";
+        trackingState.effect = "None";
+  if (results.landmarks.length > 0) {
 
-const gesture = detectGesture(landmarks);
+    const landmarks = results.landmarks[0];
 
-applyEffect(
-  ctx,
-  canvas,
-  video,
-  gesture
-);
-  if (gesture !== "none") {
-    console.log("Gesture:", gesture);
-  }
+    drawHands(
+      ctx,
+      landmarks,
+      canvas.width,
+      canvas.height
+    );
+    
+  const rawGesture = detectGesture(landmarks);  
+
+  const gesture = gestureManager.update(rawGesture);
+  trackingState.handDetected = true;
+trackingState.gesture = gesture;
+
+switch (gesture) {
+  case "peace":
+    trackingState.effect = "Blur";
+    break;
+
+  case "thumbsUp":
+    trackingState.effect = "Grayscale";
+    break;
+
+  default:
+    trackingState.effect = "None";
 }
-
-      animationId = requestAnimationFrame(render);
+  applyEffect(
+    ctx,
+    canvas,
+    video,
+    gesture
+  );
+    if (gesture !== "none") {
+      console.log("Gesture:", gesture);
     }
+  }
 
-    initialize();
+        animationId = requestAnimationFrame(render);
+      }
 
-    return () => {
-      cancelAnimationFrame(animationId);
-    };
-  }, [videoRef, canvasRef, isReady]);
+      initialize();
+
+      return () => {
+        cancelAnimationFrame(animationId);
+      };
+    }, [videoRef, canvasRef, isReady]);
+
+return trackingState;
+
 }

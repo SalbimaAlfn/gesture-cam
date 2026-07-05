@@ -1,5 +1,5 @@
 import "./Camera.css";
-
+import HUD from "../HUD/HUD";
 import useCamera from "../../hooks/useCamera";
 import useHandTracking from "../../hooks/useHandTracking";
 
@@ -11,28 +11,38 @@ export default function Camera() {
         isReady
     } = useCamera();
 
-    useHandTracking({
-        videoRef,
-        canvasRef,
-        isReady
-    });
+    const tracking = useHandTracking({
+    videoRef,
+    canvasRef,
+    isReady
+});
 
     return (
-        <div className="camera-container">
+  <div
+    style={{
+      position: "relative",
+      width: "fit-content",
+      margin: "0 auto",
+    }}
+  >
+    <HUD
+    cameraReady={isReady}
+    tracking={tracking}
+/>
 
-            <video
-                ref={videoRef}
-                autoPlay
-                muted
-                playsInline
-                className="hidden-video"
-            />
+    <video
+      ref={videoRef}
+      style={{ display: "none" }}
+      playsInline
+      muted
+    />
 
-            <canvas
-                ref={canvasRef}
-                className="camera-canvas"
-            />
-
-        </div>
-    );
+    <canvas
+      ref={canvasRef}
+      style={{
+        borderRadius: "15px",
+      }}
+    />
+  </div>
+);
 }

@@ -1,0 +1,54 @@
+.hud {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+
+  width: 260px;
+
+  padding: 18px;
+
+  border-radius: 18px;
+
+  background: rgba(20, 20, 20, 0.75);
+
+  backdrop-filter: blur(14px);
+
+  color: white;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  z-index: 100;
+}
+
+.hud-header {
+  margin-bottom: 15px;
+}
+
+.hud-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.hud-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hud-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 15px;
+}
+
+.green {
+  color: #43ff64;
+  font-weight: bold;
+}
+
+.red {
+  color: #ff4343;
+  font-weight: bold;
+}
