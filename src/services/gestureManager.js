@@ -3,25 +3,28 @@ class GestureManager {
     this.currentGesture = "none";
     this.lastGesture = "none";
     this.lastChangeTime = 0;
-
-    // Time (ms) before accepting a new gesture
-    this.HOLD_TIME = 250;
+    this.HOLD_TIME = 240;
   }
 
   update(newGesture) {
     const now = performance.now();
 
-    // Same gesture detected continuously
-    if (newGesture === this.lastGesture) {
-      if (
-        now - this.lastChangeTime >= this.HOLD_TIME
-      ) {
-        this.currentGesture = newGesture;
-      }
-    } else {
-      // New gesture detected
+    if (newGesture === "none") {
+      this.currentGesture = "none";
+      this.lastGesture = "none";
+      this.lastChangeTime = now;
+      return this.currentGesture;
+    }
+
+    if (newGesture !== this.currentGesture) {
+      this.currentGesture = newGesture;
       this.lastGesture = newGesture;
       this.lastChangeTime = now;
+      return this.currentGesture;
+    }
+
+    if (now - this.lastChangeTime >= this.HOLD_TIME) {
+      this.currentGesture = newGesture;
     }
 
     return this.currentGesture;
@@ -38,7 +41,6 @@ class GestureManager {
   }
 }
 
-// Export a single shared instance
 const gestureManager = new GestureManager();
 
 export default gestureManager;

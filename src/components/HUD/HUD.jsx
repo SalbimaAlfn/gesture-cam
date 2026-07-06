@@ -1,9 +1,6 @@
 import "./HUD.css";
 
-export default function HUD({
-  cameraReady = false,
-  tracking,
-}) {
+export default function HUD({ cameraReady = false, tracking }) {
   return (
     <div className="hud">
       <div className="hud-header">
@@ -38,6 +35,26 @@ export default function HUD({
         <div className="hud-item">
           <span>⚡ FPS</span>
           <span>{tracking.fps}</span>
+        </div>
+
+        <div className="hud-item">
+          <span>📈 Confidence</span>
+          <span>{tracking.confidence ?? 0}%</span>
+        </div>
+
+        <div className="hud-item">
+          <span>🎬 Recording</span>
+          <span>Off</span>
+        </div>
+
+        <div className="hud-item">
+          <span>📸 Screenshot</span>
+          <span>Ready</span>
+        </div>
+
+        <div className="hud-item">
+          <span>🧠 Model</span>
+          <span>Hand Landmarker</span>
         </div>
       </div>
     </div>

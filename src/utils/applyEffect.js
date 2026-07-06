@@ -1,58 +1,55 @@
-export default function applyEffect(ctx, canvas, video, gesture) {
+import blur from "./effects/blur";
+import gray from "./effects/gray";
+import pixelate from "./effects/pixelate";
+import freeze, { resetFreeze } from "./effects/freeze";
+import neon from "./effects/neon";
+import hearts from "./effects/hearts";
+import mirror from "./effects/mirror";
+import spotlight from "./effects/spotlight";
+
+export default function applyEffect(frame, gesture) {
   switch (gesture) {
     case "peace":
-      drawBlur(ctx, canvas, video);
+      resetFreeze();
+      blur(frame);
       break;
 
     case "thumbsUp":
-      drawGray(ctx, canvas);
+      resetFreeze();
+      gray(frame);
+      break;
+
+    case "ok":
+      resetFreeze();
+      pixelate(frame);
+      break;
+
+    case "fist":
+      freeze(frame);
+      break;
+
+    case "rock":
+      resetFreeze();
+      neon(frame);
+      break;
+
+    case "heart":
+      resetFreeze();
+      hearts(frame);
+      break;
+
+    case "wave":
+      resetFreeze();
+      mirror(frame);
+      break;
+
+    case "point":
+      resetFreeze();
+      spotlight(frame);
       break;
 
     default:
+      resetFreeze();
       break;
   }
-}
-
-function drawBlur(ctx, canvas, video) {
-  ctx.save();
-
-  ctx.filter = "blur(15px)";
-
-  ctx.scale(-1, 1);
-
-  ctx.drawImage(
-    video,
-    -canvas.width,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  ctx.restore();
-
-  ctx.filter = "none";
-}
-
-function drawGray(ctx, canvas) {
-  const image = ctx.getImageData(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  const pixels = image.data;
-
-  for (let i = 0; i < pixels.length; i += 4) {
-    const gray =
-      pixels[i] * 0.299 +
-      pixels[i + 1] * 0.587 +
-      pixels[i + 2] * 0.114;
-
-    pixels[i] = gray;
-    pixels[i + 1] = gray;
-    pixels[i + 2] = gray;
-  }
-
-  ctx.putImageData(image, 0, 0);
 }
